@@ -50,7 +50,7 @@ public class Conexion {
                     modelo.addColumn("Ref Producto");
                     modelo.addColumn("Nota");
                     modelo.addColumn("Referencia");
-                    // Recorremos el Array y vamos introduciendo los datos en la tabla
+                    
                     while (rs.next()) {
                         modelo.addRow(new Object[]{rs.getString(1), rs.getInt(2), rs.getString(3)});
                     } break;
@@ -60,7 +60,6 @@ public class Conexion {
                     modelo.addColumn("Ref Precio");
                     modelo.addColumn("Precio");
 
-                    // Recorremos el Array y vamos introduciendo los datos en la tabla
                     while (rs.next()) {
                         modelo.addRow(new Object[]{rs.getString(1), rs.getInt(2)});
                     } break;
@@ -78,11 +77,13 @@ public class Conexion {
         
         try {
             rs = prep.executeQuery("select * from Ventas where nVenta= " + pedido + "");
-            rs2 = prep.executeQuery("select * from ReferenciaProducto where refProducto in(select refProducto from Ventas where nVenta= " + pedido + ")");
-            rs3 = prep.executeQuery("select * from Precio where refPrecio in(select refPrecio from ReferenciaProducto where refProducto in(select refProducto from Ventas where nVenta= " + pedido + "))");
-            
+            int nVenta = rs.getInt(2);
             int Cantidad = rs.getInt(3);
+            rs2 = prep.executeQuery("select * from ReferenciaProducto where refProducto in(select refProducto from Ventas where nVenta= " + pedido + ")");
+            String nombre = rs2.getString(2);
+            rs3 = prep.executeQuery("select * from Precio where refPrecio in(select refPrecio from ReferenciaProducto where refProducto in(select refProducto from Ventas where nVenta= " + pedido + "))");
             int Pt = rs3.getInt(2);
+
             int PrecioTotal = Cantidad * Pt;
             
             modelo.addColumn("NumVenta");
@@ -90,7 +91,7 @@ public class Conexion {
             modelo.addColumn("Precio");
             
             while (rs.next()) {
-                modelo.addRow(new Object[]{rs.getInt(2), rs2.getString(2), PrecioTotal});
+                modelo.addRow(new Object[]{nVenta, nombre, PrecioTotal});
             }
             
         } catch (SQLException ex) {}
